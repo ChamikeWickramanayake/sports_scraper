@@ -1,0 +1,148 @@
+{
+  "sources": [
+    {
+      "id": "espn",
+      "name": "ESPN",
+      "url": "https://www.espn.com",
+      "sports": ["Football", "Basketball", "Baseball", "American Football", "Hockey", "Soccer", "Tennis", "Golf"],
+      "enabled": true,
+      "scraper_type": "espn"
+    },
+    {
+      "id": "espn_cricinfo",
+      "name": "ESPN Cricinfo",
+      "url": "https://www.espncricinfo.com",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "espn_cricinfo"
+    },
+    {
+      "id": "bbc_sport",
+      "name": "BBC Sport",
+      "url": "https://www.bbc.com/sport",
+      "sports": ["Football", "Tennis", "Cricket", "Rugby", "Golf", "Basketball"],
+      "enabled": true,
+      "scraper_type": "bbc_sport"
+    },
+    {
+      "id": "flashscore",
+      "name": "Flashscore",
+      "url": "https://www.flashscore.com",
+      "sports": ["Football", "Basketball", "Tennis", "Hockey", "Baseball", "Cricket"],
+      "enabled": true,
+      "scraper_type": "flashscore"
+    },
+    {
+      "id": "icc_cricket",
+      "name": "ICC Cricket",
+      "url": "https://www.icc-cricket.com",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "icc_cricket"
+    },
+    {
+      "id": "cricbuzz",
+      "name": "Cricbuzz",
+      "url": "https://www.cricbuzz.com",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "cricbuzz"
+    },
+    {
+      "id": "cricket_australia",
+      "name": "Cricket Australia",
+      "url": "https://www.cricket.com.au",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "cricket_australia"
+    },
+    {
+      "id": "bcci",
+      "name": "BCCI",
+      "url": "https://www.bcci.tv",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "bcci"
+    },
+    {
+      "id": "sri_lanka_cricket",
+      "name": "Sri Lanka Cricket",
+      "url": "https://www.srilankacricket.lk",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "sri_lanka_cricket"
+    },
+    {
+      "id": "nba",
+      "name": "NBA",
+      "url": "https://www.nba.com",
+      "sports": ["Basketball"],
+      "enabled": true,
+      "scraper_type": "nba"
+    },
+    {
+      "id": "nfl",
+      "name": "NFL",
+      "url": "https://www.nfl.com",
+      "sports": ["American Football"],
+      "enabled": true,
+      "scraper_type": "nfl"
+    },
+    {
+      "id": "mlb",
+      "name": "MLB",
+      "url": "https://www.mlb.com",
+      "sports": ["Baseball"],
+      "enabled": true,
+      "scraper_type": "mlb"
+    },
+    {
+      "id": "atp_tennis",
+      "name": "ATP Tennis",
+      "url": "https://www.atptour.com",
+      "sports": ["Tennis"],
+      "enabled": true,
+      "scraper_type": "atp_tennis"
+    },
+    {
+      "id": "wta_tennis",
+      "name": "WTA Tennis",
+      "url": "https://www.wtatennis.com",
+      "sports": ["Tennis"],
+      "enabled": true,
+      "scraper_type": "wta_tennis"
+    },
+    {
+      "id": "world_rugby",
+      "name": "World Rugby",
+      "url": "https://www.world.rugby",
+      "sports": ["Rugby"],
+      "enabled": true,
+      "scraper_type": "world_rugby"
+    },
+    {
+      "id": "goal",
+      "name": "Goal.com",
+      "url": "https://www.goal.com",
+      "sports": ["Football"],
+      "enabled": true,
+      "scraper_type": "goal"
+    },
+    {
+      "id": "transfermarkt",
+      "name": "Transfermarkt",
+      "url": "https://www.transfermarkt.com",
+      "sports": ["Football"],
+      "enabled": true,
+      "scraper_type": "transfermarkt"
+    },
+    {
+      "id": "livescore",
+      "name": "LiveScore",
+      "url": "https://www.livescore.com",
+      "sports": ["Football", "Basketball", "Tennis", "Baseball", "Cricket"],
+      "enabled": true,
+      "scraper_type": "livescore"
+    }
+  ]
+}

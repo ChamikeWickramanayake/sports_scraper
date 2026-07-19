@@ -1,0 +1,49 @@
+2026-07-19 20:05:21,216 - sports_scraper - INFO - 
+
+2026-07-19 20:05:21,216 - sports_scraper - INFO - ============================================================
+2026-07-19 20:05:21,217 - sports_scraper - INFO - Testing Sports Events Scrapers
+2026-07-19 20:05:21,217 - sports_scraper - INFO - ============================================================
+2026-07-19 20:05:21,219 - sports_scraper - INFO - Loaded 18 scrapers
+2026-07-19 20:05:21,220 - sports_scraper - INFO - Loaded 18 scrapers, testing first 3...
+2026-07-19 20:05:21,220 - sports_scraper - INFO - 
+[1/3] Testing espn...
+2026-07-19 20:05:21,220 - sports_scraper - INFO - Scraping espn (generic mode)...
+2026-07-19 20:05:24,774 - sports_scraper - INFO - Found 2 potential events from espn
+2026-07-19 20:05:24,778 - sports_scraper - INFO - 
+[2/3] Testing espn_cricinfo...
+2026-07-19 20:05:24,778 - sports_scraper - INFO - Scraping ESPN Cricinfo...
+2026-07-19 20:05:29,087 - sports_scraper - INFO - Found 0 cricket events from Cricinfo
+2026-07-19 20:05:29,089 - sports_scraper - INFO - 
+[3/3] Testing bbc_sport...
+2026-07-19 20:05:29,089 - sports_scraper - INFO - Scraping BBC Sport...
+2026-07-19 20:05:29,884 - sports_scraper - WARNING - Attempt 1 failed: 404 Client Error: Not Found for url: https://www.bbc.com/sport/live
+2026-07-19 20:05:34,952 - sports_scraper - WARNING - Attempt 2 failed: 404 Client Error: Not Found for url: https://www.bbc.com/sport/live
+2026-07-19 20:05:40,012 - sports_scraper - WARNING - Attempt 3 failed: 404 Client Error: Not Found for url: https://www.bbc.com/sport/live
+2026-07-19 20:05:40,012 - sports_scraper - ERROR - Failed to fetch https://www.bbc.com/sport/live after 3 attempts
+2026-07-19 20:05:40,013 - sports_scraper - WARNING - Failed to fetch BBC Sport page
+2026-07-19 20:05:40,016 - sports_scraper - INFO - 
+============================================================
+2026-07-19 20:05:40,016 - sports_scraper - INFO - Test Summary
+2026-07-19 20:05:40,016 - sports_scraper - INFO - ============================================================
+2026-07-19 20:05:40,016 - sports_scraper - INFO - Successful: 3/3
+2026-07-19 20:05:40,016 - sports_scraper - INFO - Failed: 0/3
+2026-07-19 20:05:40,017 - sports_scraper - INFO - Total events found: 2
+2026-07-19 20:05:40,017 - sports_scraper - INFO - 
+Results saved to: E:\PEO SPORTS\sports_scraper\cache\test_results.json
+2026-07-19 20:05:40,020 - sports_scraper - INFO - 
+============================================================
+2026-07-19 20:05:40,020 - sports_scraper - INFO - Testing Google Sheets Authentication
+2026-07-19 20:05:40,021 - sports_scraper - INFO - ============================================================
+2026-07-19 20:05:40,968 - sports_scraper - WARNING - Credentials file not found: E:\PEO SPORTS\sports_scraper\config\credentials.json
+2026-07-19 20:05:40,969 - sports_scraper - INFO - Skipping Google Sheets auth test
+2026-07-19 20:05:40,969 - sports_scraper - INFO - 
+============================================================
+2026-07-19 20:05:40,969 - sports_scraper - INFO - Test Complete
+2026-07-19 20:05:40,969 - sports_scraper - INFO - ============================================================
+2026-07-19 20:05:40,972 - sports_scraper - INFO - 
+Next steps:
+2026-07-19 20:05:40,972 - sports_scraper - INFO - 1. Run: python setup.bat (if not done)
+2026-07-19 20:05:40,972 - sports_scraper - INFO - 2. Set up Google Sheets credentials (see README.md)
+2026-07-19 20:05:40,972 - sports_scraper - INFO - 3. Run: python main.py
+2026-07-19 20:05:40,973 - sports_scraper - INFO - 
+
