@@ -4,7 +4,7 @@ Automated Python program to scrape upcoming sports events from multiple trusted 
 
 ## Features
 
-- **Multi-Source Scraping**: 28 sports news providers defined in `config/sources.json`
+- **Multi-Source Scraping**: 30 sports news providers defined in `config/sources.json`
 - **Multiple Sports**: Cricket, Football, Basketball, Tennis, Rugby, Baseball, American Football, Hockey, Golf
 - **Web Scraping**: BeautifulSoup-based extraction from major sports websites
 - **Parallel Execution**: ThreadPoolExecutor for fast concurrent scraping
@@ -22,7 +22,7 @@ Automated Python program to scrape upcoming sports events from multiple trusted 
 sports_scraper/
 +-- config/
 |   +-- config.py              # Central configuration
-|   +-- sources.json           # Source definitions (28 sources)
+|   +-- sources.json           # Source definitions (30 sources)
 +-- scrapers/
 |   +-- base_scraper.py        # Base class for all scrapers
 |   +-- cricbuzz_scraper.py    # Dedicated scraper (real dates/venues)
@@ -203,8 +203,8 @@ Modify `config/sources.json` to enable/disable sources:
 
 Sources in `sources.json` fall into three groups:
 
-- **Dedicated scrapers** - `cricbuzz` (parses the Cricbuzz upcoming-series schedule; real dates and venues) and `bbc_sport` (parses BBC scores-fixtures pages for Football and Cricket; real dates).
-- **Disabled sources** (kept in the file with a `disabled_reason`): `espn_cricinfo`, `espn`, `espn_sri_lanka`, and `pcb` are blocked by bot protection; `flashscore`, `livescore`, `asian_cricket`, and `zimbabwe_cricket` are fully client-rendered and would need a real browser to scrape.
+- **Dedicated scrapers** - `cricbuzz` (parses the Cricbuzz upcoming-series schedule; real dates and venues) and `bbc_sport` (parses BBC scores-fixtures pages for Football and Cricket, including the dedicated Premier League and IPL competition schedules with a month of forward coverage; real dates).
+- **Disabled sources** (kept in the file with a `disabled_reason`): `espn_cricinfo`, `espn`, `espn_sri_lanka`, and `pcb` are blocked by bot protection; `flashscore`, `livescore`, `asian_cricket`, `zimbabwe_cricket`, `iplt20`, and `premier_league` are fully client-rendered and would need a real browser to scrape (IPL and Premier League schedules come through `bbc_sport` instead).
 - **Generic sources** - the other 18 sources (ICC, NBA, NFL, MLB, ATP, WTA, and cricket boards like ECB, NZC, Cricket South Africa, Cricket West Indies, Cricket Ireland, CricTotal) use a generic heuristic scraper. Results from these are low-confidence and dates are often "TBD".
 
 ### Adjust Date Range

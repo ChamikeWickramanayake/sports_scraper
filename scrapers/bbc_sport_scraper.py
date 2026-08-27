@@ -19,12 +19,17 @@ _INITIAL_DATA = re.compile(r'window\.__INITIAL_DATA__="((?:[^"\\]|\\.)*)"')
 class BBCSportScraper(BaseScraper):
     """Scraper for BBC Sport fixtures"""
 
-    # URL path segment -> sport label
+    # URL -> (sport label, page mode). "day" pages list fixtures per date and
+    # also fetch /{YYYY-MM-DD} for the next LOOKAHEAD_DAYS days; "month" pages
+    # (per-competition schedules) list a whole month and also fetch next
+    # month's /{YYYY-MM} page for forward coverage.
     FIXTURE_PAGES = {
-        "https://www.bbc.com/sport/football/scores-fixtures": "Football",
-        "https://www.bbc.com/sport/cricket/scores-fixtures": "Cricket",
+        "https://www.bbc.com/sport/football/scores-fixtures": ("Football", "day"),
+        "https://www.bbc.com/sport/cricket/scores-fixtures": ("Cricket", "day"),
+        "https://www.bbc.com/sport/football/premier-league/scores-fixtures": ("Football", "month"),
+        "https://www.bbc.com/sport/cricket/indian-premier-league/scores-fixtures": ("Cricket", "month"),
     }
-    LOOKAHEAD_DAYS = 2  # also fetch /{YYYY-MM-DD} for the next N days
+    LOOKAHEAD_DAYS = 2
 
     def __init__(self):
         super().__init__(
@@ -39,12 +44,16 @@ class BBCSportScraper(BaseScraper):
         events = []
         seen = set()
 
-        for base_url, sport in self.FIXTURE_PAGES.items():
+        today = datetime.now()
+        for base_url, (sport, mode) in self.FIXTURE_PAGES.items():
             urls = [base_url]
-            today = datetime.now()
-            for offset in range(1, self.LOOKAHEAD_DAYS + 1):
-                day = (today + timedelta(days=offset)).strftime("%Y-%m-%d")
-                urls.append(f"{base_url}/{day}")
+            if mode == "day":
+                for offset in range(1, self.LOOKAHEAD_DAYS + 1):
+                    day = (today + timedelta(days=offset)).strftime("%Y-%m-%d")
+                    urls.append(f"{base_url}/{day}")
+            else:  # month
+                next_month = (today.replace(day=1) + timedelta(days=32)).strftime("%Y-%m")
+                urls.append(f"{base_url}/{next_month}")
 
             for url in urls:
                 response = self.fetch_page(url)

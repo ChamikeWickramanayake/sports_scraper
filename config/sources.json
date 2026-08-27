@@ -231,6 +231,24 @@
       "sports": ["Cricket"],
       "enabled": true,
       "scraper_type": "cricket_ireland"
+    },
+    {
+      "id": "iplt20",
+      "name": "IPL (official site)",
+      "url": "https://www.iplt20.com/matches/fixtures",
+      "sports": ["Cricket"],
+      "enabled": false,
+      "disabled_reason": "client-rendered JS shell (7KB, no links server-side) — requires a browser (verified 2026-08). IPL schedule is covered by the bbc_sport scraper's IPL fixtures page and by cricbuzz.",
+      "scraper_type": "iplt20"
+    },
+    {
+      "id": "premier_league",
+      "name": "Premier League (official site)",
+      "url": "https://www.premierleague.com/en/matches",
+      "sports": ["Football"],
+      "enabled": false,
+      "disabled_reason": "fixtures are loaded client-side (no match data in the HTML) — requires a browser (verified 2026-08). Premier League schedule is covered by the bbc_sport scraper's Premier League fixtures page.",
+      "scraper_type": "premier_league"
     }
   ]
 }
