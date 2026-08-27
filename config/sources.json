@@ -147,6 +147,90 @@
       "enabled": false,
       "disabled_reason": "client-rendered single-page app — requires a browser (verified 2026-08)",
       "scraper_type": "livescore"
+    },
+    {
+      "id": "windies_cricket",
+      "name": "Cricket West Indies",
+      "url": "https://www.windiescricket.com/",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "windies_cricket"
+    },
+    {
+      "id": "espn_sri_lanka",
+      "name": "ESPN Cricket - Sri Lanka",
+      "url": "https://www.espn.com/cricket/scores/team/8/sri-lanka",
+      "sports": ["Cricket"],
+      "enabled": false,
+      "disabled_reason": "espn.com serves an Akamai bot challenge (202, empty body) to non-browser clients (verified 2026-08)",
+      "scraper_type": "espn_sri_lanka"
+    },
+    {
+      "id": "asian_cricket",
+      "name": "Asian Cricket Council",
+      "url": "https://www.asiancricket.org/home",
+      "sports": ["Cricket"],
+      "enabled": false,
+      "disabled_reason": "client-rendered JS shell (2KB, no links server-side) — requires a browser (verified 2026-08)",
+      "scraper_type": "asian_cricket"
+    },
+    {
+      "id": "crictotal",
+      "name": "CricTotal",
+      "url": "https://www.crictotal.com/",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "crictotal"
+    },
+    {
+      "id": "ecb",
+      "name": "England and Wales Cricket Board",
+      "url": "https://www.ecb.co.uk/",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "ecb"
+    },
+    {
+      "id": "pcb",
+      "name": "Pakistan Cricket Board",
+      "url": "https://www.pcb.com.pk/",
+      "sports": ["Cricket"],
+      "enabled": false,
+      "disabled_reason": "returns 403 to non-browser clients (verified 2026-08)",
+      "scraper_type": "pcb"
+    },
+    {
+      "id": "cricket_south_africa",
+      "name": "Cricket South Africa",
+      "url": "https://www.cricket.co.za/",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "cricket_south_africa"
+    },
+    {
+      "id": "nzc",
+      "name": "New Zealand Cricket",
+      "url": "https://www.nzc.nz/",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "nzc"
+    },
+    {
+      "id": "zimbabwe_cricket",
+      "name": "Zimbabwe Cricket",
+      "url": "https://www.zimcricket.org/",
+      "sports": ["Cricket"],
+      "enabled": false,
+      "disabled_reason": "client-rendered JS shell (3KB, no links server-side) — requires a browser (verified 2026-08)",
+      "scraper_type": "zimbabwe_cricket"
+    },
+    {
+      "id": "cricket_ireland",
+      "name": "Cricket Ireland",
+      "url": "https://cricketireland.ie/",
+      "sports": ["Cricket"],
+      "enabled": true,
+      "scraper_type": "cricket_ireland"
     }
   ]
 }

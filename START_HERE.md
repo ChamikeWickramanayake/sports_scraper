@@ -95,7 +95,7 @@ venv\Scripts\python.exe main.py
 | `main.py` | Main scraper - run `python main.py` |
 | `test_scrapers.py` | Test the scrapers and Excel export |
 | `config/config.py` | Settings (date range, delays, timeouts) |
-| `config/sources.json` | List of 18 sports sources to scrape |
+| `config/sources.json` | List of 28 sports sources to scrape |
 | `output/sports_events_[timestamp].xlsx` | The results land here |
 | `logs/scraper.log` | Check this for errors/details |
 | `README.md` | Full documentation |
