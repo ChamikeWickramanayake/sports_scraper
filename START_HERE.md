@@ -7,7 +7,7 @@ Your complete sports events scraper project is ready in: `c:\Bassa\sports_scrape
 **Files Created:**
 - Main scraper script (`main.py`)
 - Dedicated web scrapers (Cricbuzz, BBC Sport) plus a generic fallback scraper
-- Excel export to `output\sports_events.xlsx`
+- Excel export to `output\sports_events_[timestamp].xlsx`
 - Configuration files
 - Logging system
 - Windows Task Scheduler batch file
@@ -61,7 +61,7 @@ venv\Scripts\python.exe main.py
 
 **Expected:**
 - Script runs and scrapes events
-- Open `output\sports_events.xlsx` - events appear!
+- Open `output\sports_events_[timestamp].xlsx` - events appear!
 - Check `logs\scraper.log` for details
 
 ### Step 4: Schedule Daily Run (Optional)
@@ -85,7 +85,7 @@ venv\Scripts\python.exe main.py
 | Virtual environment fails | Delete `venv` folder, run `complete_setup.bat` again |
 | Dependencies won't install | Activate venv first: `venv\Scripts\activate` |
 | No events in Excel file | Check `logs\scraper.log`; run `python test_scrapers.py` |
-| Excel file won't save | Close `output\sports_events.xlsx` in Excel first |
+| Excel file won't save | Close `output\sports_events_[timestamp].xlsx` in Excel first |
 
 ## Files to Know About
 
@@ -96,7 +96,7 @@ venv\Scripts\python.exe main.py
 | `test_scrapers.py` | Test the scrapers and Excel export |
 | `config/config.py` | Settings (date range, delays, timeouts) |
 | `config/sources.json` | List of 18 sports sources to scrape |
-| `output/sports_events.xlsx` | The results land here |
+| `output/sports_events_[timestamp].xlsx` | The results land here |
 | `logs/scraper.log` | Check this for errors/details |
 | `README.md` | Full documentation |
 | `QUICKSTART.md` | Quick reference |
@@ -106,7 +106,7 @@ venv\Scripts\python.exe main.py
 1. **Install Python** (if not done)
 2. **Run**: `complete_setup.bat`
 3. **Test**: `venv\Scripts\python.exe main.py`
-4. **Open**: `output\sports_events.xlsx`
+4. **Open**: `output\sports_events_[timestamp].xlsx`
 5. **Schedule** in Windows Task Scheduler (optional)
 
 ---

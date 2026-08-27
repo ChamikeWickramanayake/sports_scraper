@@ -7,7 +7,7 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
 from datetime import datetime
-from config.config import EXCEL_FILE, EXCEL_COLUMNS
+from config.config import OUTPUT_DIR, EXCEL_FILE_PREFIX, EXCEL_COLUMNS
 from utils.logger import logger
 
 # Control characters openpyxl refuses to write (IllegalCharacterError)
@@ -27,11 +27,15 @@ class ExcelExporter:
     def __init__(self, file_path=None):
         """
         Initialize Excel exporter
-        
+
         Args:
-            file_path (Path): Path to Excel file (default: config.EXCEL_FILE)
+            file_path (Path): Path to Excel file (default: a new
+                timestamped file in OUTPUT_DIR, one per run)
         """
-        self.file_path = file_path or EXCEL_FILE
+        if file_path is None:
+            stamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+            file_path = OUTPUT_DIR / f"{EXCEL_FILE_PREFIX}_{stamp}.xlsx"
+        self.file_path = file_path
         self.columns = EXCEL_COLUMNS + ["Teams", "Source", "Timestamp"]
         self.workbook = None
         self.sheet = None

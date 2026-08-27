@@ -79,7 +79,7 @@ This parses offline HTML fixtures in `tests/fixtures/`, live-tests the first 3 e
 (venv) python main.py
 ```
 
-Open `output\sports_events.xlsx` - events should appear! Re-running appends new events and skips rows that already exist (same Sport, Event, Event Date, and Location).
+Open `output\sports_events_[timestamp].xlsx` - events should appear! Each run creates its own new timestamped file.
 
 ## Running Daily
 
@@ -113,7 +113,7 @@ Open `output\sports_events.xlsx` - events should appear! Re-running appends new 
 - Run: `pip install -r requirements.txt`
 
 ### Excel file not updating
-- Close `output\sports_events.xlsx` in Excel - an open workbook is locked for writing
+- Close `output\sports_events_[timestamp].xlsx` in Excel - an open workbook is locked for writing
 - Check `logs/scraper.log` for errors
 - Manually run: `python main.py`
 
@@ -128,7 +128,7 @@ Open `output\sports_events.xlsx` - events should appear! Re-running appends new 
 3. Install dependencies
 4. Test with `python test_scrapers.py`
 5. Run full script with `python main.py`
-6. Open `output\sports_events.xlsx`
+6. Open `output\sports_events_[timestamp].xlsx`
 7. Schedule in Task Scheduler
 
 ---

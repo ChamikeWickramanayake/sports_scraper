@@ -8,7 +8,7 @@ Python automated installation has encountered persistent issues on this system. 
 
 - Complete sports scraper project created
 - Dedicated web scrapers (Cricbuzz, BBC Sport) plus a generic fallback scraper
-- Excel export ready (`output\sports_events.xlsx`)
+- Excel export ready (`output\sports_events_[timestamp].xlsx`)
 - All configuration files created
 - Windows Task Scheduler support ready
 - Complete documentation written
@@ -72,7 +72,7 @@ This will:
 python main.py
 ```
 
-Open `output\sports_events.xlsx` - events will appear!
+Open `output\sports_events_[timestamp].xlsx` - events will appear!
 
 ---
 
@@ -119,7 +119,7 @@ All files are in: `c:\Bassa\sports_scraper\`
 1. **Install Python** (download & run)
 2. **Run**: `complete_setup.bat`
 3. **Run**: `python main.py`
-4. **Done!** Events appear in `output\sports_events.xlsx`
+4. **Done!** Events appear in `output\sports_events_[timestamp].xlsx`
 
 ---
 

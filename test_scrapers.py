@@ -90,8 +90,7 @@ def test_excel_export():
     
     try:
         from utils.excel_export import ExcelExporter
-        from config.config import EXCEL_FILE
-        
+
         exporter = ExcelExporter()
         
         # Test with sample data
@@ -108,7 +107,7 @@ def test_excel_export():
         ]
         
         exporter.append_events(sample_events)
-        logger.info(f"✓ Successfully created/updated Excel file: {EXCEL_FILE}")
+        logger.info(f"✓ Successfully created/updated Excel file: {exporter.file_path}")
         return True
     
     except Exception as e:

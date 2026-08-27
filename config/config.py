@@ -20,7 +20,8 @@ LOG_LEVEL = "INFO"
 # Excel export configuration
 OUTPUT_DIR = PROJECT_ROOT / "output"
 OUTPUT_DIR.mkdir(exist_ok=True)
-EXCEL_FILE = OUTPUT_DIR / "sports_events.xlsx"
+# Each run writes its own file: <prefix>_<YYYY-MM-DD_HHMMSS>.xlsx
+EXCEL_FILE_PREFIX = "sports_events"
 
 # Scraper configuration
 SCRAPER_TIMEOUT = 30  # seconds

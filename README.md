@@ -8,9 +8,9 @@ Automated Python program to scrape upcoming sports events from multiple trusted 
 - **Multiple Sports**: Cricket, Football, Basketball, Tennis, Rugby, Baseball, American Football, Hockey, Golf
 - **Web Scraping**: BeautifulSoup-based extraction from major sports websites
 - **Parallel Execution**: ThreadPoolExecutor for fast concurrent scraping
-- **Deduplication**: Smart event matching to prevent duplicates across sources and across runs
+- **Deduplication**: Smart event matching to prevent duplicates across sources within a run
 - **Date Filtering**: Automatically excludes past events, configurable date range
-- **Excel Export**: Appends events to `output/sports_events.xlsx` (no cloud services, no credentials)
+- **Excel Export**: Each run writes its own timestamped file `output/sports_events_[timestamp].xlsx` (no cloud services, no credentials)
 - **Local Caching**: 24-hour cache to avoid redundant scrapes
 - **Error Handling**: Retry logic, fallback scrapers, comprehensive logging
 - **Windows Task Scheduler**: Pre-built batch file for daily automation
@@ -104,7 +104,7 @@ python main.py
 
 **Expected Output:**
 - Check `logs/scraper.log` for execution details
-- Events appear in `output/sports_events.xlsx`
+- Events appear in `output/sports_events_[timestamp].xlsx`
 
 That's it - there is nothing else to configure. No accounts, no API keys, no credentials.
 
@@ -112,17 +112,31 @@ That's it - there is nothing else to configure. No accounts, no API keys, no cre
 
 ### Manual Execution
 
-**Easiest**: double-click `run.bat` - it runs the scraper with live output in a console window, tells you where the results are, and waits for a keypress before closing. It uses the virtual environment automatically (or system Python if the venv is missing).
+**Easiest**: double-click `run.bat` - it first asks:
+
+```
+Enter a link to scrape (or press Enter to scrape all configured sources):
+```
+
+Press Enter to run the normal full scrape, or paste a specific link to scrape only that page (it then asks for an optional sport name - press Enter to auto-detect). Output is shown live in the console, and the window waits for a keypress before closing. It uses the virtual environment automatically (or system Python if the venv is missing).
 
 From a terminal:
 
 ```bash
 cd c:\Bassa\sports_scraper
 venv\Scripts\activate
+
+# Scrape all configured sources
 python main.py
+
+# Scrape one specific link only
+python main.py --url https://www.example.com/fixtures
+
+# Same, with an explicit sport label (auto-detected if omitted)
+python main.py --url https://www.example.com/fixtures --sport Cricket
 ```
 
-Re-running appends new events to the existing Excel file; rows that already exist (same Sport, Event, Event Date, and Location) are skipped - so manual runs mix safely with scheduled ones.
+A manual link is scraped with the generic heuristic scraper, so results are low-confidence (dates may be "TBD") and land in that run's own Excel file. Each run writes its own timestamped Excel file, so manual runs never interfere with scheduled ones.
 
 ### Schedule with Windows Task Scheduler
 
@@ -172,7 +186,7 @@ Note: created this way, the task only runs while the user is logged on. To run i
 2. Right-click -> **Run**
 3. Wait a few seconds
 4. Check `logs/` folder for `scheduler_*.log`
-5. Verify events in `output/sports_events.xlsx`
+5. Verify events in `output/sports_events_[timestamp].xlsx`
 
 ## Configuration
 
@@ -220,7 +234,7 @@ all_events = self.scrape_all(max_workers=5)  # Increase for faster scraping
 
 ### Excel Columns
 
-Events are written to `output/sports_events.xlsx` with these 8 columns:
+Events are written to `output/sports_events_[timestamp].xlsx` with these 8 columns:
 
 | Column | Description |
 |--------|-------------|
@@ -233,7 +247,7 @@ Events are written to `output/sports_events.xlsx` with these 8 columns:
 | Source | Which website the event came from |
 | Timestamp | When the row was added to the file |
 
-Duplicate rows (same Sport, Event, Event Date, and Location) are skipped on re-runs.
+Duplicates are removed within a run; each run produces its own independent file.
 
 ### Logs
 
@@ -252,7 +266,7 @@ Logs are saved to:
 
 ### Issue: "Excel file won't save / permission denied"
 
-**Solution**: Close `output/sports_events.xlsx` in Excel before running the scraper - an open workbook is locked for writing.
+**Solution**: Close `output/sports_events_[timestamp].xlsx` in Excel before running the scraper - an open workbook is locked for writing.
 
 ### Issue: "Task Scheduler task fails silently"
 

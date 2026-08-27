@@ -19,11 +19,13 @@ This will:
 venv\Scripts\python.exe main.py
 ```
 
+Or just double-click `run.bat` - press Enter to scrape all sources, or paste a specific link to scrape only that page (`python main.py --url <link>` does the same from a terminal).
+
 ### Step 3: Open the Results
 
-Open `output\sports_events.xlsx` - events should appear!
+Open `output\sports_events_[timestamp].xlsx` - events should appear!
 
-Re-running appends new events and skips duplicates automatically.
+Each run creates its own new timestamped file.
 
 ### Step 4: Schedule Daily Run (Optional)
 1. Open Task Scheduler (`Win + R` -> `taskschd.msc`)
@@ -49,7 +51,7 @@ This parses offline HTML fixtures in `tests/fixtures/`, live-tests the first 3 e
 |---------|----------|
 | "Python not found" | Install Python 3.8+, add to PATH (see `PYTHON_INSTALLATION_HELP.md`) |
 | "Module not found" | Run `setup.bat` again, or `venv\Scripts\python.exe -m pip install -r requirements.txt` |
-| Excel file won't save | Close `output\sports_events.xlsx` in Excel before running |
+| Excel file won't save | Close `output\sports_events_[timestamp].xlsx` in Excel before running |
 | Few/no events from a source | Only `cricbuzz` and `bbc_sport` have dedicated scrapers; the rest are heuristic |
 | "Task fails silently" | Check `logs\scheduler_*.log` |
 
@@ -59,12 +61,13 @@ This parses offline HTML fixtures in `tests/fixtures/`, live-tests the first 3 e
 sports_scraper/
 +-- setup.bat              <- Run this first!
 +-- complete_setup.bat     <- Same, plus runs the tests
++-- run.bat                <- Double-click to run (all sources, or one link)
 +-- main.py                <- Main scraper script
 +-- test_scrapers.py       <- Test the scrapers and Excel export
 +-- config/
 |   +-- config.py          <- Settings (date range, delays, timeouts)
 |   +-- sources.json       <- Edit: enable/disable sources
-+-- output/                <- sports_events.xlsx lands here
++-- output/                <- sports_events_[timestamp].xlsx lands here
 +-- logs/                  <- Check here for errors
 +-- requirements.txt       <- Python dependencies
 +-- README.md              <- Full documentation

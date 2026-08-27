@@ -2,11 +2,12 @@
 Main Orchestrator
 Coordinates scraping, deduplication, and Excel export
 """
+import argparse
 import json
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from config.config import CACHE_DIR, CACHE_EXPIRY_HOURS, MIN_EVENT_DAYS_AHEAD, MAX_EVENT_DAYS_AHEAD
-from scrapers.scraper_factory import load_scrapers_from_config
+from scrapers.scraper_factory import load_scrapers_from_config, create_scraper_for_url
 from utils.excel_export import ExcelExporter
 from utils.logger import logger
 
@@ -68,15 +69,17 @@ class EventOrchestrator:
             logger.error(f"{scraper.source_id}: scraping failed: {e}")
             return (scraper.source_id, [])
     
-    def scrape_all(self, max_workers=5):
+    def scrape_all(self, scrapers=None, max_workers=5):
         """
-        Run all scrapers in parallel.
-        
+        Run scrapers in parallel.
+
         Args:
+            scrapers (list): Scraper instances to run (default: load from config)
             max_workers (int): Maximum concurrent scrapers
         """
         logger.info("Starting parallel scraping...")
-        scrapers = load_scrapers_from_config()
+        if scrapers is None:
+            scrapers = load_scrapers_from_config()
         
         if not scrapers:
             logger.error("No scrapers loaded!")
@@ -183,20 +186,25 @@ class EventOrchestrator:
         logger.info(f"Deduplicated: {len(events)} → {len(unique_events)}")
         return unique_events
     
-    def run(self):
+    def run(self, url=None, sport=None):
         """
         Execute the full workflow: scrape, deduplicate, filter, export to Excel.
+
+        Args:
+            url (str): Scrape only this URL instead of the configured sources
+            sport (str): Sport label for the URL's events (auto-detect if None)
         """
         logger.info("=" * 60)
         logger.info("Starting Sports Events Scraper")
         logger.info(f"Timestamp: {datetime.now().isoformat()}")
         logger.info("=" * 60)
-        
+
         # Load cache
         self.load_cache()
-        
-        # Scrape all sources
-        all_events = self.scrape_all(max_workers=5)
+
+        # Scrape a single manual URL, or all configured sources
+        scrapers = [create_scraper_for_url(url, sport)] if url else None
+        all_events = self.scrape_all(scrapers=scrapers, max_workers=5)
         
         # Filter by date range
         filtered_events = self.filter_events(all_events)
@@ -213,7 +221,7 @@ class EventOrchestrator:
             try:
                 exporter = ExcelExporter()
                 exporter.append_events(unique_events)
-                logger.info("Successfully exported to Excel")
+                logger.info(f"Successfully exported to Excel: {exporter.file_path}")
             except Exception as e:
                 logger.error(f"Failed to export to Excel: {e}")
         
@@ -225,9 +233,14 @@ class EventOrchestrator:
 
 def main():
     """Entry point"""
+    parser = argparse.ArgumentParser(description="Sports Events Scraper")
+    parser.add_argument("--url", help="Scrape only this URL instead of the configured sources")
+    parser.add_argument("--sport", help="Sport label for --url events (auto-detected if omitted)")
+    args = parser.parse_args()
+
     try:
         orchestrator = EventOrchestrator()
-        orchestrator.run()
+        orchestrator.run(url=args.url, sport=args.sport)
     except Exception as e:
         logger.error(f"Fatal error: {e}", exc_info=True)
         raise

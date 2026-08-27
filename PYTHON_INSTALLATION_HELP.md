@@ -165,7 +165,7 @@ Once Python is installed:
 1. Run: `cd c:\Bassa\sports_scraper`
 2. Run: `setup.bat` (creates the venv and installs dependencies)
 3. Run: `python main.py`
-4. Open the results: `output\sports_events.xlsx`
+4. Open the results: `output\sports_events_[timestamp].xlsx`
 
 ## Need Help?
 

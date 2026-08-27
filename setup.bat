@@ -65,7 +65,7 @@ echo ===============================================
 echo.
 echo Next steps:
 echo 1. Run the scraper:  venv\Scripts\python.exe main.py
-echo 2. Check the output: output\sports_events.xlsx
+echo 2. Check the output: output\sports_events_[timestamp].xlsx
 echo 3. Check the logs:   logs\scraper.log
 echo.
 echo For detailed setup instructions, see README.md
