@@ -3,9 +3,9 @@
 ## Prerequisites Check
 
 Before running the scraper, ensure you have:
-- ✓ Python 3.8+ installed and added to PATH
-- ✓ A Google Cloud project with service account credentials
-- ✓ A Google Sheet created and shared with service account
+- Python 3.8+ installed and added to PATH
+
+That's all - the scraper writes to a local Excel file, so there are no accounts, API keys, or credentials to set up.
 
 ## Step-by-Step Setup
 
@@ -17,21 +17,27 @@ Before running the scraper, ensure you have:
 3. **IMPORTANT**: Check "Add Python to PATH" during installation
 4. Click "Install Now"
 
+Or use the provided installer script:
+```cmd
+powershell -ExecutionPolicy Bypass -File install_python.ps1
+```
+(If not run as administrator, it falls back to a per-user install. Open a NEW terminal afterwards so the PATH change takes effect.)
+
 **Verify Installation:**
-Open Command Prompt or PowerShell and run:
+Open a NEW Command Prompt or PowerShell and run:
 ```cmd
 python --version
 ```
 
 Should show: `Python 3.x.x`
 
-If you see "Python was not found", go to Settings → Apps → Advanced app settings → App execution aliases and disable "python.exe" and "python3.exe" (Windows Store aliases).
+If you see "Python was not found", go to Settings -> Apps -> Advanced app settings -> App execution aliases and disable "python.exe" and "python3.exe" (Windows Store aliases). See `PYTHON_INSTALLATION_HELP.md` for more troubleshooting.
 
 ### 2. Create Virtual Environment
 
 Open Command Prompt in the project folder:
 ```cmd
-cd "e:\PEO SPORTS\sports_scraper"
+cd c:\Bassa\sports_scraper
 python -m venv venv
 ```
 
@@ -41,6 +47,8 @@ venv\Scripts\activate
 ```
 
 You should see `(venv)` at the start of your prompt.
+
+(Shortcut: `setup.bat` performs steps 2 and 3 for you; `complete_setup.bat` also runs the test suite afterwards.)
 
 ### 3. Install Dependencies
 
@@ -52,103 +60,26 @@ pip install -r requirements.txt
 This will install:
 - beautifulsoup4 (web scraping)
 - requests (HTTP)
-- google-auth-oauthlib (Google auth)
-- google-api-python-client (Google Sheets API)
-- And others...
+- openpyxl (Excel export)
 
-### 4. Set Up Google Credentials
-
-#### 4a. Create Google Cloud Project
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project (name: "Sports Scraper")
-3. Enable Google Sheets API:
-   - Search for "Google Sheets API"
-   - Click "Enable"
-
-#### 4b. Create Service Account
-1. Go to "Service Accounts" in Google Cloud Console
-2. Click "Create Service Account"
-3. Fill in:
-   - Service account name: "sports-scraper"
-   - Service account ID: (auto-filled)
-   - Click "Create and Continue"
-4. Grant role: **Editor**
-5. Click "Continue" → "Done"
-
-#### 4c. Generate JSON Key
-1. In Service Accounts, click the new account
-2. Go to "Keys" tab
-3. Click "Add Key" → "Create new key" → "JSON"
-4. A file downloads automatically
-5. Move it to: `config/credentials.json`
-
-**⚠️ SECURITY**: Never commit credentials.json to version control!
-
-### 5. Create Google Sheet
-
-1. Go to [Google Sheets](https://sheets.google.com)
-2. Create a new blank spreadsheet
-3. Name it "Sports Events"
-4. Share it with the service account email:
-   - Open `config/credentials.json`
-   - Find the `"client_email"` field
-   - Copy the email address
-   - In Google Sheet: Click Share → Paste email → Share
-
-### 6. Configure Sheet ID
-
-#### Option A: Environment Variable (Recommended)
-
-**Command Prompt:**
-```cmd
-setx GOOGLE_SHEET_ID "your-sheet-id-here"
-```
-
-**PowerShell:**
-```powershell
-[Environment]::SetEnvironmentVariable("GOOGLE_SHEET_ID", "your-sheet-id-here", "User")
-```
-
-Then restart your terminal/IDE.
-
-#### Option B: Edit config.py
-
-Open `config/config.py` and change:
-```python
-GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID", "your-sheet-id-here")
-```
-
-### 7. Find Your Sheet ID
-
-1. Open your Google Sheet in browser
-2. Look at the URL: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
-3. Copy the `{SHEET_ID}` part (long string of characters)
-4. Use this in step 6
+That's the complete dependency list.
 
 ## Testing
 
-### Test Scrapers Only (No Google Sheets)
-
 ```cmd
-(venv) cd "e:\PEO SPORTS\sports_scraper"
+(venv) cd c:\Bassa\sports_scraper
 (venv) python test_scrapers.py
 ```
 
-This will test scrapers without needing Google Sheets setup. Check output in console.
+This parses offline HTML fixtures in `tests/fixtures/`, live-tests the first 3 enabled scrapers, and tests the Excel export. Exit code 0 means everything passed. Check output in console and `logs/scraper.log`.
 
-### Full Test with Google Sheets
+## Full Run
 
-Make sure:
-1. `config/credentials.json` exists
-2. `GOOGLE_SHEET_ID` is set
-3. Google Sheet is shared with service account
-
-Then run:
 ```cmd
 (venv) python main.py
 ```
 
-Check your Google Sheet — events should appear!
+Open `output\sports_events.xlsx` - events should appear! Re-running appends new events and skips rows that already exist (same Sport, Event, Event Date, and Location).
 
 ## Running Daily
 
@@ -160,49 +91,45 @@ Check your Google Sheet — events should appear!
 ### Option 2: Windows Task Scheduler
 
 1. Open Task Scheduler (Press `Win + R`, type `taskschd.msc`)
-2. Right-click → Create Basic Task:
+2. Right-click -> Create Basic Task:
    - **Name**: "Sports Scraper Daily"
    - **Trigger**: Daily at 6:00 AM
    - **Action**: Run program
-     - Program: `e:\PEO SPORTS\sports_scraper\scheduler.bat`
-     - Start in: `e:\PEO SPORTS\sports_scraper`
+     - Program: `c:\Bassa\sports_scraper\scheduler.bat`
+     - Start in: `c:\Bassa\sports_scraper`
 3. Click Finish
-4. Test by right-clicking task → Run
+4. Test by right-clicking task -> Run
+
+`scheduler.bat` uses `venv\Scripts\python.exe` when the virtual environment exists and falls back to the system `python` otherwise. Each run writes its own log to `logs\scheduler_<timestamp>.log` - check there if a scheduled run fails.
 
 ## Troubleshooting
 
 ### Error: "Python was not found"
-- Disable Microsoft Store Python alias (Settings → Apps → App execution aliases)
-- Or use full path: `C:\Users\YOUR_USERNAME\AppData\Local\Programs\Python\Python310\python.exe`
+- Disable Microsoft Store Python alias (Settings -> Apps -> App execution aliases)
+- Or use full path: `C:\Users\YOUR_USERNAME\AppData\Local\Programs\Python\Python311\python.exe`
 
 ### Error: "Module not found"
 - Make sure virtual environment is activated: `(venv)` should show in prompt
 - Run: `pip install -r requirements.txt`
 
-### Error: "Credentials file not found"
-- Download credentials.json from Google Cloud Console
-- Place in: `e:\PEO SPORTS\sports_scraper\config\credentials.json`
-
-### Error: "GOOGLE_SHEET_ID not configured"
-- Set environment variable (step 6)
-- Or edit `config/config.py`
-
-### Google Sheet not updating
-- Verify service account email has Edit access to sheet
+### Excel file not updating
+- Close `output\sports_events.xlsx` in Excel - an open workbook is locked for writing
 - Check `logs/scraper.log` for errors
 - Manually run: `python main.py`
 
+### A source returns no events
+- Only `cricbuzz` and `bbc_sport` have dedicated scrapers with reliable dates; the other enabled sources use a generic heuristic scraper (low confidence, dates often "TBD")
+- Four sources are intentionally disabled in `config/sources.json` (see their `disabled_reason`): `espn` and `espn_cricinfo` (Akamai bot protection), `flashscore` and `livescore` (client-rendered, need a browser)
+
 ## Next Steps
 
-1. Install Python ✓
-2. Create virtual environment ✓
-3. Install dependencies ✓
-4. Set up Google Cloud credentials ✓
-5. Create Google Sheet ✓
-6. Configure GOOGLE_SHEET_ID ✓
-7. Test with `python test_scrapers.py`
-8. Run full script with `python main.py`
-9. Schedule in Task Scheduler
+1. Install Python
+2. Create virtual environment (or run `setup.bat`)
+3. Install dependencies
+4. Test with `python test_scrapers.py`
+5. Run full script with `python main.py`
+6. Open `output\sports_events.xlsx`
+7. Schedule in Task Scheduler
 
 ---
 

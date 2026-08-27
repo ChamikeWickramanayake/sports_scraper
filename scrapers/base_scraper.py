@@ -6,7 +6,7 @@ import requests
 import time
 import random
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from config.config import (
     USER_AGENTS,
     SCRAPER_TIMEOUT,
@@ -72,26 +72,78 @@ class BaseScraper(ABC):
                 else:
                     logger.error(f"Failed to fetch {url} after {SCRAPER_RETRY_ATTEMPTS} attempts")
                     return None
-        return None
-    
-    @abstractmethod
+
     def scrape(self):
+        """
+        Scrape events from the source, with failures made visible.
+
+        Wraps the subclass _scrape() so that exceptions and empty results
+        are always logged instead of silently producing an empty list.
+
+        Returns:
+            list: List of event dictionaries (see _scrape).
+        """
+        try:
+            events = self._scrape() or []
+        except Exception:
+            logger.error(f"{self.source_id}: scrape failed with an unexpected error", exc_info=True)
+            return []
+
+        if not events:
+            logger.warning(
+                f"{self.source_id}: 0 events scraped from {self.source_url} — "
+                "fetch failed or page structure may have changed"
+            )
+        else:
+            logger.info(f"{self.source_id}: scraped {len(events)} events")
+        return events
+
+    @abstractmethod
+    def _scrape(self):
         """
         Scrape events from the source.
         Must be implemented by subclasses.
-        
+
         Returns:
             list: List of event dictionaries with keys:
                 - sport (str): Sport name
                 - event_name (str): Event or match name
                 - broadcaster (str): Broadcasting partner
-                - event_date (str): Event date and time (ISO format)
+                - event_date (str): Event date, ISO %Y-%m-%d or "TBD"
                 - location (str): Event location
                 - teams (str): Teams/players involved
                 - source (str): Source URL or ID
         """
         pass
-    
+
+    @staticmethod
+    def to_iso_date(value):
+        """
+        Normalize a date value to ISO %Y-%m-%d.
+
+        Args:
+            value: Epoch milliseconds (int or numeric str) or an ISO-like
+                   date string ("2026-08-27", "2026-08-27T18:30:00Z", ...).
+
+        Returns:
+            str: "YYYY-MM-DD", or "TBD" if the value can't be interpreted.
+        """
+        if value is None:
+            return "TBD"
+        try:
+            if isinstance(value, (int, float)) or (isinstance(value, str) and value.isdigit()):
+                ms = float(value)
+                if ms > 1e11:  # epoch milliseconds
+                    ms /= 1000.0
+                return datetime.fromtimestamp(ms, tz=timezone.utc).strftime("%Y-%m-%d")
+            text = str(value).strip()
+            # ISO date or datetime prefix
+            candidate = text[:10]
+            datetime.strptime(candidate, "%Y-%m-%d")
+            return candidate
+        except (ValueError, OverflowError, OSError):
+            return "TBD"
+
     def normalize_event(self, sport, event_name, broadcaster, event_date, location, teams=""):
         """
         Normalize event data.
@@ -108,11 +160,11 @@ class BaseScraper(ABC):
             dict: Normalized event
         """
         return {
-            "sport": sport.strip() if sport else "",
-            "event_name": event_name.strip() if event_name else "",
-            "broadcaster": broadcaster.strip() if broadcaster else "",
+            "sport": str(sport).strip() if sport else "",
+            "event_name": str(event_name).strip() if event_name else "",
+            "broadcaster": str(broadcaster).strip() if broadcaster else "",
             "event_date": str(event_date).strip() if event_date else "",
-            "location": location.strip() if location else "",
-            "teams": teams.strip() if teams else "",
+            "location": str(location).strip() if location else "",
+            "teams": str(teams).strip() if teams else "",
             "source": self.source_id,
         }

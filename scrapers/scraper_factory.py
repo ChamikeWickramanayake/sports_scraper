@@ -4,7 +4,6 @@ Dynamically creates scrapers based on configuration
 """
 import json
 from config.config import SOURCES_FILE
-from scrapers.base_scraper import BaseScraper
 from scrapers.espn_cricinfo_scraper import ESPNCricinfoScraper
 from scrapers.bbc_sport_scraper import BBCSportScraper
 from scrapers.flashscore_scraper import FlashscoreScraper
@@ -21,80 +20,56 @@ SCRAPER_CLASSES = {
     "generic": GenericScraper,
 }
 
-def get_scraper(source_id, source_url=None, sports=None):
-    """
-    Factory function to get the right scraper.
-    
-    Args:
-        source_id (str): Source identifier
-        source_url (str): Source URL (optional, used for generic scrapers)
-        sports (list): Sports list (optional, used for generic scrapers)
-        
-    Returns:
-        BaseScraper: Appropriate scraper instance
-    """
-    scraper_class = SCRAPER_CLASSES.get(source_id)
-    
-    if scraper_class and scraper_class != GenericScraper:
-        try:
-            return scraper_class()
-        except Exception as e:
-            logger.warning(f"Failed to instantiate {source_id}: {e}, falling back to generic")
-    
-    # Fallback to generic scraper
-    if source_url and sports:
-        return GenericScraper(source_id, source_url, sports)
-    else:
-        logger.error(f"Cannot create scraper for {source_id}: missing URL or sports")
-        return None
-
 def load_scrapers_from_config():
     """
     Load all enabled scrapers from configuration file.
-    
+
     Returns:
         list: List of scraper instances
     """
     scrapers = []
-    
+
     try:
-        with open(SOURCES_FILE, "r") as f:
+        with open(SOURCES_FILE, "r", encoding="utf-8") as f:
             config = json.load(f)
-        
-        for source in config.get("sources", []):
-            if not source.get("enabled", True):
-                logger.debug(f"Skipping disabled source: {source['id']}")
-                continue
-            
-            scraper_type = source.get("scraper_type", "generic")
-            
-            if scraper_type in SCRAPER_CLASSES:
-                scraper_class = SCRAPER_CLASSES[scraper_type]
-                try:
-                    if scraper_type == "generic":
-                        scraper = scraper_class(
-                            source["id"],
-                            source["url"],
-                            source.get("sports", [])
-                        )
-                    else:
-                        scraper = scraper_class()
-                    scrapers.append(scraper)
-                    logger.debug(f"Loaded scraper: {source['id']}")
-                except Exception as e:
-                    logger.error(f"Failed to load scraper {source['id']}: {e}")
-            else:
-                # Use generic scraper
-                scraper = GenericScraper(
-                    source["id"],
-                    source["url"],
-                    source.get("sports", [])
-                )
-                scrapers.append(scraper)
-                logger.debug(f"Loaded generic scraper: {source['id']}")
-    
     except Exception as e:
-        logger.error(f"Failed to load scrapers from config: {e}")
-    
+        logger.error(f"Failed to read sources config {SOURCES_FILE}: {e}")
+        return scrapers
+
+    for source in config.get("sources", []):
+        source_id = source.get("id")
+        try:
+            if not source_id:
+                logger.warning(f"Skipping source with no 'id': {source}")
+                continue
+
+            if not source.get("enabled", True):
+                reason = source.get("disabled_reason", "")
+                logger.info(f"Skipping disabled source: {source_id}" + (f" ({reason})" if reason else ""))
+                continue
+
+            url = source.get("url")
+            sports = source.get("sports", [])
+            scraper_type = source.get("scraper_type", "generic")
+            scraper_class = SCRAPER_CLASSES.get(scraper_type)
+
+            if scraper_class and scraper_class is not GenericScraper:
+                scraper = scraper_class()
+            else:
+                if not url:
+                    logger.warning(f"Skipping source {source_id}: no 'url' for generic scraping")
+                    continue
+                if not scraper_class:
+                    logger.info(
+                        f"No dedicated scraper for type '{scraper_type}' ({source_id}) — "
+                        "using GenericScraper (heuristic, low confidence)"
+                    )
+                scraper = GenericScraper(source_id, url, sports)
+
+            scrapers.append(scraper)
+            logger.debug(f"Loaded scraper: {source_id}")
+        except Exception as e:
+            logger.error(f"Failed to load scraper {source_id or '<unknown>'}: {e}")
+
     logger.info(f"Loaded {len(scrapers)} scrapers")
     return scrapers

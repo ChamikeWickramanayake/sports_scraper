@@ -1,7 +1,6 @@
 """
 Configuration settings for Sports Events Scraper
 """
-import os
 from pathlib import Path
 
 # Project paths
@@ -31,9 +30,10 @@ REQUEST_DELAY = 2  # seconds between requests per scraper
 
 # User agents for web requests
 USER_AGENTS = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0",
 ]
 
 # Data configuration
@@ -41,17 +41,14 @@ CACHE_EXPIRY_HOURS = 24  # Cache data for 24 hours
 MIN_EVENT_DAYS_AHEAD = 0  # Include events from today onwards (0) or future only (1)
 MAX_EVENT_DAYS_AHEAD = 365  # Include events up to 1 year ahead
 
-# Excel columns (in order)
+# Excel columns (base columns; ExcelExporter appends Teams, Source, Timestamp)
 EXCEL_COLUMNS = [
     "Sport",
     "Event",
     "Broadcasting Partner",
     "Event Date",
     "Location",
-    "Teams": 5,
-    "Source": 6,
-    "Last Updated": 7,
-}
+]
 
 # Deduplication settings
 DEDUP_TOLERANCE_HOURS = 24  # Events within 24 hours of each other are considered duplicates

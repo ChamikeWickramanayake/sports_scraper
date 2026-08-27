@@ -26,7 +26,7 @@ echo Found Python %PYTHON_VERSION%
 echo.
 
 echo [2/4] Creating virtual environment...
-if exist "venv" (
+if exist "venv\Scripts\python.exe" (
     echo Virtual environment already exists. Skipping...
 ) else (
     python -m venv venv
@@ -39,19 +39,18 @@ if exist "venv" (
 )
 echo.
 
-echo [3/4] Activating virtual environment...
-call venv\Scripts\activate.bat
-if errorlevel 1 (
-    echo ERROR: Failed to activate virtual environment
+echo [3/4] Verifying virtual environment...
+set VENV_PY=%SCRIPT_DIR%venv\Scripts\python.exe
+if not exist "%VENV_PY%" (
+    echo ERROR: Virtual environment is incomplete - delete the venv folder and re-run
     pause
     exit /b 1
 )
-echo Virtual environment activated
+echo Virtual environment ready
 echo.
 
 echo [4/4] Installing dependencies...
-pip install --upgrade pip >nul 2>&1
-pip install -r requirements.txt
+"%VENV_PY%" -m pip install -r requirements.txt
 if errorlevel 1 (
     echo ERROR: Failed to install dependencies
     pause
@@ -65,10 +64,9 @@ echo Setup completed successfully!
 echo ===============================================
 echo.
 echo Next steps:
-echo 1. Download credentials.json from Google Cloud Console
-echo 2. Place it in: config/credentials.json
-echo 3. Set environment variable: GOOGLE_SHEET_ID=your-sheet-id
-echo 4. Run: python main.py
+echo 1. Run the scraper:  venv\Scripts\python.exe main.py
+echo 2. Check the output: output\sports_events.xlsx
+echo 3. Check the logs:   logs\scraper.log
 echo.
 echo For detailed setup instructions, see README.md
 echo.

@@ -2,12 +2,10 @@
 Main Orchestrator
 Coordinates scraping, deduplication, and Excel export
 """
-import os
 import json
-from pathlib import Path
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from config.config import CACHE_DIR, MIN_EVENT_DAYS_AHEAD, MAX_EVENT_DAYS_AHEAD
+from config.config import CACHE_DIR, CACHE_EXPIRY_HOURS, MIN_EVENT_DAYS_AHEAD, MAX_EVENT_DAYS_AHEAD
 from scrapers.scraper_factory import load_scrapers_from_config
 from utils.excel_export import ExcelExporter
 from utils.logger import logger
@@ -19,20 +17,19 @@ class EventOrchestrator:
         """Initialize orchestrator"""
         self.cache_file = CACHE_DIR / "events_cache.json"
         self.events_cache = {}
-        self.all_events = []
     
     def load_cache(self):
         """Load events from cache if available"""
         try:
             if self.cache_file.exists():
-                with open(self.cache_file, "r") as f:
+                with open(self.cache_file, "r", encoding="utf-8") as f:
                     cache = json.load(f)
-                
+
                 # Check if cache is fresh
                 cache_time = datetime.fromisoformat(cache.get("timestamp", ""))
                 age_hours = (datetime.now() - cache_time).total_seconds() / 3600
-                
-                if age_hours < 24:
+
+                if age_hours < CACHE_EXPIRY_HOURS:
                     self.events_cache = cache.get("events", {})
                     logger.info(f"Loaded cache with {len(self.events_cache)} events (age: {age_hours:.1f}h)")
                     return True
@@ -48,8 +45,8 @@ class EventOrchestrator:
                 "timestamp": datetime.now().isoformat(),
                 "events": {k: v for k, v in self.events_cache.items()},
             }
-            with open(self.cache_file, "w") as f:
-                json.dump(cache, f, indent=2)
+            with open(self.cache_file, "w", encoding="utf-8") as f:
+                json.dump(cache, f, indent=2, ensure_ascii=False)
             logger.info(f"Saved cache with {len(self.events_cache)} events")
         except Exception as e:
             logger.error(f"Failed to save cache: {e}")
@@ -66,7 +63,6 @@ class EventOrchestrator:
         """
         try:
             events = scraper.scrape()
-            logger.info(f"{scraper.source_id}: scraped {len(events)} events")
             return (scraper.source_id, events)
         except Exception as e:
             logger.error(f"{scraper.source_id}: scraping failed: {e}")
@@ -84,7 +80,7 @@ class EventOrchestrator:
         
         if not scrapers:
             logger.error("No scrapers loaded!")
-            return
+            return []
         
         all_events = []
         
@@ -111,31 +107,43 @@ class EventOrchestrator:
         Returns:
             list: Filtered events
         """
-        now = datetime.now()
-        min_date = now + timedelta(days=MIN_EVENT_DAYS_AHEAD)
-        max_date = now + timedelta(days=MAX_EVENT_DAYS_AHEAD)
-        
+        # Compare at day granularity: parsed dates land at midnight, so a
+        # time-of-day floor would always exclude today's events.
+        today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        min_date = today + timedelta(days=MIN_EVENT_DAYS_AHEAD)
+        max_date = today + timedelta(days=MAX_EVENT_DAYS_AHEAD)
+
         filtered = []
         for event in events:
             try:
                 # Try to parse event date
                 event_date_str = event.get("event_date", "")
-                
+
                 # Skip if date is "TBD" or empty
                 if not event_date_str or event_date_str == "TBD":
                     filtered.append(event)
                     continue
-                
+
                 # Simple date parsing (try multiple formats)
                 event_date = None
-                for fmt in ["%Y-%m-%d", "%d-%m-%Y", "%Y-%m-%d %H:%M", "%d/%m/%Y"]:
+                for fmt in ["%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%d %b %Y", "%b %d, %Y", "%B %d, %Y"]:
                     try:
-                        event_date = datetime.strptime(event_date_str.split()[0], fmt)
+                        event_date = datetime.strptime(event_date_str, fmt)
                         break
-                    except:
+                    except ValueError:
                         continue
-                
-                if event_date and min_date <= event_date <= max_date:
+                if event_date is None:
+                    # Retry with just the leading token ("2026-08-27 18:30" etc.)
+                    try:
+                        event_date = datetime.strptime(event_date_str.split()[0], "%Y-%m-%d")
+                    except ValueError:
+                        pass
+
+                if event_date is None:
+                    # Unparseable date: keep the event rather than silently dropping it
+                    logger.warning(f"Unparseable event date kept as-is: {event_date_str!r} ({event.get('event_name', '')})")
+                    filtered.append(event)
+                elif min_date <= event_date <= max_date:
                     filtered.append(event)
             except Exception as e:
                 logger.debug(f"Error filtering event: {e}")

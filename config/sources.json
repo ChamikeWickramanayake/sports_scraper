@@ -5,7 +5,8 @@
       "name": "ESPN",
       "url": "https://www.espn.com",
       "sports": ["Football", "Basketball", "Baseball", "American Football", "Hockey", "Soccer", "Tennis", "Golf"],
-      "enabled": true,
+      "enabled": false,
+      "disabled_reason": "espn.com serves an Akamai bot challenge (16-byte body) to non-browser clients (verified 2026-08)",
       "scraper_type": "espn"
     },
     {
@@ -13,7 +14,8 @@
       "name": "ESPN Cricinfo",
       "url": "https://www.espncricinfo.com",
       "sports": ["Cricket"],
-      "enabled": true,
+      "enabled": false,
+      "disabled_reason": "Akamai bot protection returns 403 to non-browser clients via TLS fingerprinting (verified 2026-08); cricket covered by cricbuzz",
       "scraper_type": "espn_cricinfo"
     },
     {
@@ -29,7 +31,8 @@
       "name": "Flashscore",
       "url": "https://www.flashscore.com",
       "sports": ["Football", "Basketball", "Tennis", "Hockey", "Baseball", "Cricket"],
-      "enabled": true,
+      "enabled": false,
+      "disabled_reason": "fully client-rendered JS shell; data feeds need a generated x-fsign header — requires a browser (verified 2026-08)",
       "scraper_type": "flashscore"
     },
     {
@@ -141,7 +144,8 @@
       "name": "LiveScore",
       "url": "https://www.livescore.com",
       "sports": ["Football", "Basketball", "Tennis", "Baseball", "Cricket"],
-      "enabled": true,
+      "enabled": false,
+      "disabled_reason": "client-rendered single-page app — requires a browser (verified 2026-08)",
       "scraper_type": "livescore"
     }
   ]

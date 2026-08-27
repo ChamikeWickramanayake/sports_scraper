@@ -2,11 +2,23 @@
 Excel Export Module
 Handles all interactions with local Excel files
 """
+import re
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
 from datetime import datetime
 from config.config import EXCEL_FILE, EXCEL_COLUMNS
 from utils.logger import logger
+
+# Control characters openpyxl refuses to write (IllegalCharacterError)
+_ILLEGAL_XLSX_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+
+
+def _sanitize(value):
+    """Strip characters that openpyxl can't write to a cell."""
+    if isinstance(value, str):
+        return _ILLEGAL_XLSX_CHARS.sub("", value)
+    return value
 
 
 class ExcelExporter:
@@ -65,7 +77,7 @@ class ExcelExporter:
             "Timestamp": 20,
         }
         for col_idx, column_name in enumerate(self.columns, start=1):
-            self.sheet.column_dimensions[chr(64 + col_idx)].width = column_widths.get(column_name, 15)
+            self.sheet.column_dimensions[get_column_letter(col_idx)].width = column_widths.get(column_name, 15)
     
     def _get_existing_events(self):
         """Get set of existing events to avoid duplicates"""
@@ -74,7 +86,7 @@ class ExcelExporter:
         if self.sheet.max_row > 1:  # Skip header row
             for row_idx in range(2, self.sheet.max_row + 1):
                 row_data = []
-                for col_idx in range(1, 6):  # Sport, Event, Date, Location (first 4 unique columns)
+                for col_idx in range(1, 6):  # first 5 columns; key uses Sport, Event, Event Date, Location
                     cell = self.sheet.cell(row=row_idx, column=col_idx)
                     row_data.append(str(cell.value) if cell.value else "")
                 
@@ -134,7 +146,7 @@ class ExcelExporter:
                 
                 for col_idx, value in enumerate(row_data, start=1):
                     cell = self.sheet.cell(row=next_row, column=col_idx)
-                    cell.value = value
+                    cell.value = _sanitize(value)
                     cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=True)
                 
                 existing_events.add(event_key)

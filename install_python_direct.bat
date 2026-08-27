@@ -13,45 +13,51 @@ echo.
 cd /d "%~dp0"
 
 echo [1/3] Downloading Python installer...
-powershell -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -OutFile '%TEMP%\python-install.exe'" 
+powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -OutFile '%TEMP%\python-install.exe' -UseBasicParsing"
 
 if not exist "%TEMP%\python-install.exe" (
     echo ERROR: Failed to download Python
-    timeout /t 5
+    pause
     exit /b 1
 )
-echo ✓ Downloaded
+echo [OK] Downloaded
 
 echo.
-echo [2/3] Running installer (InstallAllUsers=1 PrependPath=1)...
-"%TEMP%\python-install.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_pip=1
-
+echo [2/3] Running installer...
+REM All-users install needs admin; fall back to per-user install
+net session >nul 2>&1
+if %ERRORLEVEL% equ 0 (
+    "%TEMP%\python-install.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_pip=1
+) else (
+    echo Not running as administrator - installing for current user only
+    "%TEMP%\python-install.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_pip=1
+)
 if %ERRORLEVEL% neq 0 (
     echo WARNING: Installer returned error code %ERRORLEVEL%
-    echo Attempting alternative installation method...
 )
 
-timeout /t 5
+ping -n 6 127.0.0.1 >nul
 
 echo.
 echo [3/3] Verifying installation...
-python --version >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
-    echo ✓ Python %PYTHON_VERSION% installed successfully!
+REM PATH changes don't reach this already-running shell,
+REM so check the known install locations directly.
+set PY_EXE=
+if exist "C:\Program Files\Python311\python.exe" set "PY_EXE=C:\Program Files\Python311\python.exe"
+if exist "%LOCALAPPDATA%\Programs\Python\Python311\python.exe" set "PY_EXE=%LOCALAPPDATA%\Programs\Python\Python311\python.exe"
+
+if defined PY_EXE (
+    for /f "tokens=2" %%i in ('"!PY_EXE!" --version 2^>^&1') do set PYTHON_VERSION=%%i
+    echo [OK] Python !PYTHON_VERSION! installed successfully!
+    echo Open a NEW terminal so the updated PATH takes effect, then run: python --version
 ) else (
-    echo ✗ Python not found in PATH
-    echo Checking installation directory...
-    
-    dir "C:\Program Files\Python311\python.exe" 2>nul
-    if %ERRORLEVEL% equ 0 (
-        echo ✓ Python installed but not in PATH
-        echo Adding to PATH...
-        setx PATH "%PATH%;C:\Program Files\Python311"
-        echo Please restart your terminal and try again
+    python --version >nul 2>&1
+    if !ERRORLEVEL! equ 0 (
+        for /f "tokens=2" %%i in ('python --version 2^>^&1') do set PYTHON_VERSION=%%i
+        echo [OK] Python !PYTHON_VERSION! is available
     ) else (
-        echo ✗ Installation failed
-        timeout /t 5
+        echo [X] Installation failed - Python not found
+        pause
         exit /b 1
     )
 )
@@ -59,3 +65,4 @@ if %ERRORLEVEL% equ 0 (
 del /f "%TEMP%\python-install.exe" 2>nul
 echo.
 echo Complete!
+pause
